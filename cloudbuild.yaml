@@ -1,0 +1,8 @@
+steps:
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+    id: 'install'
+
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['build']
+    id: 'build'
