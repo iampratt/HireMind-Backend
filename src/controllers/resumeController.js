@@ -3,6 +3,7 @@ const Resume = require('../models/Resume');
 const fs = require('fs').promises;
 const path = require('path');
 const { cleanupOrphanedFiles, getFileStats } = require('../utils/fileCleanup');
+const { decryptApiKey } = require('../utils/encryptApiKey');
 
 class ResumeController {
   async uploadResume(req, res) {
@@ -15,7 +16,8 @@ class ResumeController {
       }
 
       const userId = req.user.id;
-      const geminiApiKey = req.user.geminiApiKey;
+      const encryptedGeminiApiKey = req.user.geminiApiKey;
+      const geminiApiKey = decryptApiKey(encryptedGeminiApiKey);
       const filePath = req.file.path;
       const fileName = req.file.originalname;
 
@@ -181,7 +183,8 @@ class ResumeController {
     try {
       const userId = req.user.id;
       const resumeId = req.params.id;
-      const geminiApiKey = req.user.geminiApiKey;
+      const encryptedGeminiApiKey = req.user.geminiApiKey;
+      const geminiApiKey = decryptApiKey(encryptedGeminiApiKey);
 
       // Find resume and check ownership
       const resume = await Resume.findOne({

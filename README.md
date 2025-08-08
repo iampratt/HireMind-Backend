@@ -23,7 +23,7 @@ A Node.js/Express backend that uses AI (Google Gemini) to parse resumes and sear
 - **HTTP Client**: Axios
 - **HTML Parsing**: Cheerio
 - **Validation**: Joi
-- **Security**: Helmet, CORS, Rate Limiting
+- **Security**: Helmet, CORS, Rate Limiting, Encrypted API Keys
 
 ## 📋 Prerequisites
 
@@ -59,6 +59,9 @@ DATABASE_URL="mongodb://localhost:27017/hiremind"
 JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
 JWT_EXPIRES_IN="7d"
 
+# Encryption Configuration
+ENCRYPTION_KEY="your-secret-encryption-key-32-chars-long"
+
 # Server Configuration
 PORT=3000
 NODE_ENV="development"
@@ -90,6 +93,26 @@ npm start
 ```
 
 The server will start on `http://localhost:3000`
+
+## 🔐 Security Features
+
+### API Key Encryption
+
+- **Gemini API Keys**: User-provided Gemini API keys are encrypted using AES-256-CBC encryption before being stored in the database
+- **Encryption Key**: Uses a 32-character encryption key stored in the `ENCRYPTION_KEY` environment variable
+- **Automatic Decryption**: API keys are automatically decrypted when needed for AI operations
+- **Secure Storage**: Encrypted API keys are excluded from API responses for security
+
+### Password Security
+
+- **Bcrypt Hashing**: User passwords are hashed using bcrypt with 12 salt rounds
+- **One-way Encryption**: Passwords cannot be decrypted, only verified during login
+
+### JWT Authentication
+
+- **Token-based**: Uses JSON Web Tokens for stateless authentication
+- **Configurable Expiry**: Token expiration can be configured via `JWT_EXPIRES_IN`
+- **Secure Headers**: Uses Bearer token authentication scheme
 
 ## 📚 API Documentation
 

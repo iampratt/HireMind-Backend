@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema(
     toJSON: {
       transform: function (doc, ret) {
         delete ret.password;
+        delete ret.geminiApiKey;
         return ret;
       },
       virtuals: true,

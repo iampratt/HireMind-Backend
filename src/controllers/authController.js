@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { encryptApiKey } = require('../utils/encryptApiKey');
 
 class AuthController {
   async signup(req, res) {
@@ -21,12 +22,15 @@ class AuthController {
       const saltRounds = 12;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+      // Encrypt Gemini API key
+      const encryptedGeminiApiKey = encryptApiKey(geminiApiKey);
+
       // Create new user
       const newUser = await User.create({
         name,
         email,
         password: hashedPassword,
-        geminiApiKey,
+        geminiApiKey: encryptedGeminiApiKey,
       });
 
       // Generate JWT token

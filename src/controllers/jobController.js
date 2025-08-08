@@ -1,6 +1,7 @@
 const LinkedInService = require('../services/linkedinService');
 const Resume = require('../models/Resume');
 const { getGeminiSkillClusters } = require('../services/geminiService');
+const { decryptApiKey } = require('../utils/encryptApiKey');
 
 class JobController {
   constructor() {
@@ -164,7 +165,8 @@ class JobController {
       }
 
       // Get skill clusters from Gemini
-      const geminiApiKey = req.user.geminiApiKey || process.env.GEMINI_API_KEY;
+      const encryptedGeminiApiKey = req.user.geminiApiKey;
+      const geminiApiKey = encryptedGeminiApiKey ? decryptApiKey(encryptedGeminiApiKey) : process.env.GEMINI_API_KEY;
       const clusters = await getGeminiSkillClusters(skills, geminiApiKey);
       console.log(clusters);
 
