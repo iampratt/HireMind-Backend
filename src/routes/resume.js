@@ -27,4 +27,10 @@ router.delete('/:id', resumeController.deleteResume);
 // POST /api/resume/:id/reparse
 router.post('/:id/reparse', resumeController.reparseResume);
 
+// POST /api/resume/cleanup (Admin only)
+router.post('/cleanup', resumeController.cleanupFiles);
+
+// GET /api/resume/stats (Admin only)
+router.get('/stats', resumeController.getFileStats);
+
 module.exports = router;

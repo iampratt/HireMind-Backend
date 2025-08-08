@@ -281,6 +281,48 @@ Authorization: Bearer <jwt-token>
 }
 ```
 
+#### POST /resume/cleanup
+
+Clean up orphaned resume files (Admin only).
+
+**Headers:**
+
+```
+Authorization: Bearer <jwt-token>
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "File cleanup completed successfully"
+}
+```
+
+#### GET /resume/stats
+
+Get file statistics for uploads directory (Admin only).
+
+**Headers:**
+
+```
+Authorization: Bearer <jwt-token>
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "totalFiles": 5,
+    "orphanedFiles": 2,
+    "directoryExists": true
+  }
+}
+```
+
 ### Job Search
 
 #### GET /jobs/search

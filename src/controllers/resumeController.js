@@ -2,6 +2,7 @@ const ResumeParser = require('../services/resumeParser');
 const Resume = require('../models/Resume');
 const fs = require('fs').promises;
 const path = require('path');
+const { cleanupOrphanedFiles, getFileStats } = require('../utils/fileCleanup');
 
 class ResumeController {
   async uploadResume(req, res) {
@@ -31,6 +32,18 @@ class ResumeController {
         filePath,
         extractedData,
       });
+
+      // Delete the uploaded file after successful data extraction
+      try {
+        await fs.unlink(filePath);
+        console.log(`Resume file deleted after processing: ${fileName}`);
+      } catch (unlinkError) {
+        console.error(
+          'Error deleting resume file after processing:',
+          unlinkError
+        );
+        // Don't fail the request if file deletion fails
+      }
 
       res.status(200).json({
         success: true,
@@ -136,11 +149,13 @@ class ResumeController {
         });
       }
 
-      // Delete file from storage
+      // Delete file from storage (if it still exists)
       try {
+        await fs.access(resume.filePath);
         await fs.unlink(resume.filePath);
+        console.log(`Resume file deleted: ${resume.fileName}`);
       } catch (unlinkError) {
-        console.warn('Error deleting file from storage:', unlinkError);
+        console.warn('File not found or already deleted:', unlinkError.message);
         // Continue with database deletion even if file deletion fails
       }
 
@@ -187,7 +202,8 @@ class ResumeController {
       } catch (accessError) {
         return res.status(404).json({
           success: false,
-          message: 'Resume file not found on server',
+          message:
+            'Resume file not found on server. The file may have been automatically cleaned up after processing.',
         });
       }
 
@@ -217,6 +233,60 @@ class ResumeController {
       res.status(500).json({
         success: false,
         message: 'Failed to re-parse resume',
+        error:
+          process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  }
+
+  async cleanupFiles(req, res) {
+    try {
+      // Only allow cleanup in development or by admin users
+      if (process.env.NODE_ENV === 'production' && !req.user.isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Admin privileges required.',
+        });
+      }
+
+      await cleanupOrphanedFiles();
+
+      res.status(200).json({
+        success: true,
+        message: 'File cleanup completed successfully',
+      });
+    } catch (error) {
+      console.error('File cleanup error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to cleanup files',
+        error:
+          process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  }
+
+  async getFileStats(req, res) {
+    try {
+      // Only allow stats in development or by admin users
+      if (process.env.NODE_ENV === 'production' && !req.user.isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Admin privileges required.',
+        });
+      }
+
+      const stats = await getFileStats();
+
+      res.status(200).json({
+        success: true,
+        data: stats,
+      });
+    } catch (error) {
+      console.error('Get file stats error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get file statistics',
         error:
           process.env.NODE_ENV === 'development' ? error.message : undefined,
       });

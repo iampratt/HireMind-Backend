@@ -7,7 +7,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest",
-    "setup": "node scripts/setup.js"
+    "setup": "node scripts/setup.js",
+    "cleanup:stats": "node scripts/cleanup-files.js stats",
+    "cleanup:files": "node scripts/cleanup-files.js cleanup"
   },
   "keywords": [
     "job-search",

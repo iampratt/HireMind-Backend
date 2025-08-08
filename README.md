@@ -10,6 +10,7 @@ A Node.js/Express backend that uses AI (Google Gemini) to parse resumes and sear
 - **Resume Management**: Upload, view, delete, and re-parse resumes
 - **Smart Job Recommendations**: AI-driven job recommendations based on resume data
 - **File Upload Support**: Supports PDF, DOC, DOCX, and TXT files
+- **Automatic File Cleanup**: Resume files are automatically deleted after data extraction to save storage space
 - **Rate Limiting & Security**: Built-in security features and rate limiting
 
 ## 🛠️ Technology Stack
@@ -347,6 +348,53 @@ src/
 - **Helmet**: Security headers
 - **File Type Validation**: Only allows specific file types
 - **File Size Limits**: Prevents large file uploads
+
+## 📁 File Management
+
+### Automatic Cleanup
+
+Resume files are automatically deleted from the uploads directory after successful data extraction. This helps:
+
+- **Save Storage Space**: Prevents accumulation of large files
+- **Maintain Privacy**: Files are not stored longer than necessary
+- **Reduce Security Risk**: Minimizes exposure of sensitive data
+
+### Manual Cleanup
+
+For orphaned files or cleanup of existing files, you can use:
+
+#### Admin API Endpoints
+
+```bash
+# Get file statistics
+curl -X GET http://localhost:3000/api/resume/stats \
+  -H "Authorization: Bearer <admin-token>"
+
+# Clean up orphaned files
+curl -X POST http://localhost:3000/api/resume/cleanup \
+  -H "Authorization: Bearer <admin-token>"
+```
+
+#### Standalone Scripts
+
+```bash
+# Get file statistics
+npm run cleanup:stats
+
+# Clean up orphaned files
+npm run cleanup:files
+
+# Or run directly
+node scripts/cleanup-files.js stats
+node scripts/cleanup-files.js cleanup
+```
+
+### File Storage
+
+- **Location**: Files are stored in the `UPLOAD_DIR` (default: `./uploads`)
+- **Naming**: Files are renamed with unique timestamps to prevent conflicts
+- **Supported Formats**: PDF, DOC, DOCX, TXT
+- **Size Limit**: 10MB per file (configurable via `MAX_FILE_SIZE`)
 
 ## 🚀 Deployment
 
